@@ -3,22 +3,16 @@ import time
 import os
 import test_pb2
 import argparse
-
-def sizeof_fmt(num, suffix="B"):
-    for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
-        if abs(num) < 1024.0:
-            return f"{num:3.1f}{unit}{suffix}"
-        num /= 1024.0
-    return f"{num:.1f}Yi{suffix}"
+from datasize import DataSize
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--bytes", help="Number of rando byte to generate",
-                        type=int, default=1024*1024)
+                        type=int, default=10)
     parser.add_argument("-i", "--iterations", help="NUmber of iteration for every test",
                         type=int, default=1024)
     args = parser.parse_args()
-    print("{} for each test".format(args.iterations))
+    print("{} iteration for each test".format(args.iterations))
     print("Generate {} bytes each iteration".format(args.bytes))
 
     print("Test msgpack")
@@ -39,7 +33,7 @@ def main():
             packed = msgpack.packb(useful_dict, use_bin_type=True)
             msgpackWroteSize += len(packed)
             outfile.write(packed)
-    msgpackExecutionTime = time.time() - start;       
+    msgpackExecutionTime = time.time() - start;     
     print("\nTest msgpack")
     start = time.time()
     with open("random.protobuf", "wb") as outfile:
@@ -56,12 +50,12 @@ def main():
 
     msgpack_file_size = os.path.getsize('random.msgpack')
     protobuf_file_size = os.path.getsize('random.protobuf')
-    print("msgpack execution time :", msgpackExecutionTime)
-    print("msgpack byte written are :", sizeof_fmt(msgpackWroteSize))
-    print("msgpack file size is :", sizeof_fmt(msgpack_file_size))
-    print("protobuf execution time :", protobufExecutionTime)
-    print("protobuf byte written are :", sizeof_fmt(protobufWroteSize))
-    print("protobuf file size is :", sizeof_fmt(protobuf_file_size))
+    print("msgpack execution time {}".format(msgpackExecutionTime))
+    print("msgpack byte written are {:MB}".format(DataSize(msgpackWroteSize)))
+    print("msgpack file size is {:MB}".format(DataSize(msgpack_file_size)))
+    print("protobuf execution time {}".format(protobufExecutionTime))
+    print("protobuf byte written are {:MB}".format(DataSize(protobufWroteSize)))
+    print("protobuf file size is {:MB}".format(DataSize(protobuf_file_size)))
 
 if __name__ == "__main__":
    main()

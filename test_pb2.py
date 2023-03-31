@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ntest.proto\x12\x04test\"B\n\tEventData\x12\x0f\n\x07\x63ounter\x18\x01 \x01(\x05\x12\x14\n\x0c\x63hannel_name\x18\x02 \x01(\t\x12\x0e\n\x06\x62uffer\x18\x03 \x03(\x03\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ntest.proto\x12\x04test\"B\n\tEventData\x12\x0f\n\x07\x63ounter\x18\x01 \x01(\x05\x12\x14\n\x0c\x63hannel_name\x18\x02 \x01(\t\x12\x0e\n\x06\x62uffer\x18\x03 \x03(\x05\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'test_pb2', globals())
