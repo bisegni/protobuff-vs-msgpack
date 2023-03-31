@@ -8,7 +8,7 @@ from datasize import DataSize
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--bytes", help="Number of rando byte to generate",
-                        type=int, default=10)
+                        type=int, default=1024)
     parser.add_argument("-i", "--iterations", help="NUmber of iteration for every test",
                         type=int, default=1024)
     args = parser.parse_args()
