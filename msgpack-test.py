@@ -1,45 +1,67 @@
 import msgpack
-
-import random
+import time
 import os
 import test_pb2
+import argparse
 
-byteToGenerate = 1024*1024
-msgpackWroteSize = 0
-protobufWroteSize = 0
-with open("random.msgpack", "wb") as outfile:
-    for x in range(1024):
-        print("Msgpack Write index {}".format(x), end="\r")
-        useful_dict = {
-            "counter": x,
-            "channel_name": "string data",
-            "buffer": bytearray(os.urandom(byteToGenerate)),
-        }
-        packed = msgpack.packb(useful_dict, use_bin_type=True)
-        msgpackWroteSize += len(packed)
-        outfile.write(packed)
-print()
-with open("random.protobuf", "wb") as outfile:
-    for x in range(1024):
-        print("Protobuf Write index {}".format(x), end="\r")
-        event_data = test_pb2.EventData()
-        event_data.counter = x
-        event_data.channel_name = "string data"
-        event_data.buffer.extend(bytearray(os.urandom(byteToGenerate)))
-        to_write = event_data.SerializeToString();
-        print(to_write)
-        protobufWroteSize += len(to_write)
-        outfile.write(to_write)
 def sizeof_fmt(num, suffix="B"):
     for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
         if abs(num) < 1024.0:
             return f"{num:3.1f}{unit}{suffix}"
         num /= 1024.0
     return f"{num:.1f}Yi{suffix}"
-  
-msgpack_file_size = os.path.getsize('random.msgpack')
-protobuf_file_size = os.path.getsize('random.protobuf')
-print("msgpack byte written are :", sizeof_fmt(msgpackWroteSize))
-print("msgpack file size is :", sizeof_fmt(msgpack_file_size))
-print("protobuf byte written are :", sizeof_fmt(protobufWroteSize))
-print("protobuf file size is :", sizeof_fmt(protobuf_file_size))
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-b", "--bytes", help="Number of rando byte to generate",
+                        type=int, default=1024*1024)
+    parser.add_argument("-i", "--iterations", help="NUmber of iteration for every test",
+                        type=int, default=1024)
+    args = parser.parse_args()
+    print("{} for each test".format(args.iterations))
+    print("Generate {} bytes each iteration".format(args.bytes))
+
+    print("Test msgpack")
+    byteToGenerate = args.bytes
+    msgpackWroteSize = 0
+    protobufWroteSize = 0
+    msgpackExecutionTime = 0
+    protobufExecutionTime = 0
+    start = time.time()
+    with open("random.msgpack", "wb") as outfile:
+        for x in range(args.iterations):
+            print("Msgpack Write index {}".format(x), end="\r")
+            useful_dict = {
+                "counter": x,
+                "channel_name": "string data",
+                "buffer": bytearray(os.urandom(byteToGenerate)),
+            }
+            packed = msgpack.packb(useful_dict, use_bin_type=True)
+            msgpackWroteSize += len(packed)
+            outfile.write(packed)
+    msgpackExecutionTime = time.time() - start;       
+    print("\nTest msgpack")
+    start = time.time()
+    with open("random.protobuf", "wb") as outfile:
+        for x in range(args.iterations):
+            print("Protobuf Write index {}".format(x), end="\r")
+            event_data = test_pb2.EventData()
+            event_data.counter = x
+            event_data.channel_name = "string data"
+            event_data.buffer.extend(bytearray(os.urandom(byteToGenerate)))
+            to_write = event_data.SerializeToString();
+            protobufWroteSize += len(to_write)
+            outfile.write(to_write)
+    protobufExecutionTime = time.time() - start;     
+
+    msgpack_file_size = os.path.getsize('random.msgpack')
+    protobuf_file_size = os.path.getsize('random.protobuf')
+    print("msgpack execution time :", msgpackExecutionTime)
+    print("msgpack byte written are :", sizeof_fmt(msgpackWroteSize))
+    print("msgpack file size is :", sizeof_fmt(msgpack_file_size))
+    print("protobuf execution time :", protobufExecutionTime)
+    print("protobuf byte written are :", sizeof_fmt(protobufWroteSize))
+    print("protobuf file size is :", sizeof_fmt(protobuf_file_size))
+
+if __name__ == "__main__":
+   main()
