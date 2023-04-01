@@ -33,8 +33,8 @@ def main():
             packed = msgpack.packb(useful_dict, use_bin_type=True)
             msgpackWroteSize += len(packed)
             outfile.write(packed)
-    msgpackExecutionTime = time.time() - start;     
-    print("\nTest msgpack")
+    msgpackExecutionTime = time.time() - start;
+    print("\nTest protobuf")
     start = time.time()
     with open("random.protobuf", "wb") as outfile:
         for x in range(args.iterations):
@@ -42,7 +42,7 @@ def main():
             event_data = test_pb2.EventData()
             event_data.counter = x
             event_data.channel_name = "string data"
-            event_data.buffer.extend(bytearray(os.urandom(byteToGenerate)))
+            event_data.buffer.append(bytes(os.urandom(byteToGenerate)))
             to_write = event_data.SerializeToString();
             protobufWroteSize += len(to_write)
             outfile.write(to_write)
